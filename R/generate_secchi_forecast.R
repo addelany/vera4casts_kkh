@@ -1,14 +1,13 @@
 # generate_example_forecast
-generate_example_forecast <- function(forecast_date, # a recommended argument so you can pass the date to the function
+generate_secchi_forecast <- function(forecast_date, # a recommended argument so you can pass the date to the function
                                       model_id,
                                       targets_url, # where are the targets you are forecasting?
                                       horizon = 10, #how many days into the future
+                                      variable = "Secchi_m_sample",
                                       site, # what site(s)
                                       project_id = 'vera4cast') {
 
-  horizon_dates <- data.frame(datetime = seq.Date(from = forecast_date + days(1), by = "day", length.out = horizon),
-                              mu = NA,
-                              sigma = NA) #if this becomes a date time we may
+  horizon_dates <- data.frame(datetime = seq.Date(from = forecast_date + days(1), by = "day", length.out = horizon)) #if this becomes a date time we may
   #have a problem, days(1) should fix it
 
   # Put your forecast generating code in here, and add/remove arguments as needed.
@@ -19,7 +18,7 @@ generate_example_forecast <- function(forecast_date, # a recommended argument so
   # Get targets
   message('Getting targets')
   targets <- readr::read_csv(targets_url, show_col_types = F) |>
-    filter(variable == "Secchi_m_sample",
+    filter(variable == variable,
            site_id %in% site,
            datetime < forecast_date)
   #-------------------------------------
@@ -64,8 +63,12 @@ generate_example_forecast <- function(forecast_date, # a recommended argument so
     na.omit() %>%
     slice_tail(n=3) %>%
     summarise(mu = mean(observation), sigma = sd(observation)) %>%
-    left_join(horizon_dates, forecasted_secchi)
-    pivot_longer(names_to = "parameter", values_to = "prediction", cols = c(mu, sigma, datetime))
+    slice(rep(1:n(), each = 10)) %>%
+    cbind(horizon_dates) %>%     #add values to dates
+    pivot_longer(names_to = "parameter", values_to = "prediction", cols = c(mu, sigma))
+
+  #add values to dates
+
 
   # Generate forecasts
   message('Generated forecast')
@@ -75,15 +78,17 @@ generate_example_forecast <- function(forecast_date, # a recommended argument so
                             reference_datetime = forecast_date,
                             model_id = model_id,
                             site_id = site,
-                            parameter = rep(forecasted_secchi$parameter, horizon),
+                            parameter = forecasted_secchi$parameter,
                             family = 'ensemble',
-                            prediction = forecast,
-                            variable = var,
-                            depth_m = forecast_depths,
+                            prediction = forecasted_secchi$prediction,
+                            variable = variable,
+                            depth_m = NA,
                             duration = targets$duration[1],
                             project_id = project_id)
+  forecasted_secchi <- data.frame(forecasted_secchi)
   #-------------------------------------
 
   return(forecast_df)
+  return(forecasted_secchi)
 
 }
