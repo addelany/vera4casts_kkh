@@ -11,7 +11,7 @@ source('R/get_weather.R') # wrapper around the RopenMeteo package to get weather
 forecast_date <- Sys.Date()
 site_list <- read_csv("https://raw.githubusercontent.com/LTREB-reservoirs/vera4cast/main/vera4cast_field_site_metadata.csv",
                       show_col_types = FALSE)
-model_id <- 'secchi_example_forecast'
+model_id <- 'secchi_last3obs_mean'
 
 # this should generate a df
 #for multiple sites!
