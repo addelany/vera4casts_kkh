@@ -96,7 +96,7 @@ generate_secchi_forecast <- function(forecast_date, # a recommended argument so 
                             model_id = model_id,
                             site_id = site,
                             parameter = forecasted_secchi_rolling_avg$parameter,
-                            family = 'ensemble',
+                            family = 'normal',
                             prediction = forecasted_secchi_rolling_avg$prediction,
                             variable = variable,
                             depth_m = NA,
@@ -109,3 +109,5 @@ generate_secchi_forecast <- function(forecast_date, # a recommended argument so 
   return(forecasted_secchi)
 
 }
+
+
