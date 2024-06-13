@@ -106,7 +106,7 @@ generate_secchi_forecast <- function(forecast_date, # a recommended argument so 
   #-------------------------------------
 
   return(forecast_df)
-  return(forecasted_secchi)
+  #return(forecasted_secchi)
 
 }
 
