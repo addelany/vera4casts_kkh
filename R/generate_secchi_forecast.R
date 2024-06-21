@@ -95,14 +95,19 @@ generate_secchi_forecast <- function(forecast_date, # a recommended argument so 
                             reference_datetime = forecast_date,
                             model_id = model_id,
                             site_id = site,
-                            parameter = forecasted_secchi_rolling_avg$parameter,
+                            #parameter = forecasted_secchi_rolling_avg$parameter,
                             family = 'normal',
-                            prediction = forecasted_secchi_rolling_avg$prediction,
+                            #prediction = forecasted_secchi_rolling_avg$prediction,
                             variable = variable,
                             depth_m = NA,
                             duration = targets$duration[1],
                             project_id = project_id)
-  forecasted_secchi <- data.frame(forecasted_secchi_rolling_avg)
+
+  forecast_df <- forecast_df |>
+    right_join(forecasted_secchi_rolling_avg, by = c('datetime')) |>
+    select(reference_datetime, datetime, site_id, model_id, variable, family, parameter, prediction, depth_m, project_id, duration)
+
+  #forecasted_secchi <- data.frame(forecasted_secchi_rolling_avg)
   #-------------------------------------
 
   return(forecast_df)
